@@ -1,0 +1,8 @@
+transit_dbt_sandbox:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: transit_dbt_sandbox.duckdb  # Path is relative to the project root
+      schema: main
+      threads: 4

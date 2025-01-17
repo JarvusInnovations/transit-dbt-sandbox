@@ -23,8 +23,10 @@ models/
 
 - Python 3.11+
 - uv (package manager)
-- DuckDB
+- DuckDB CLI (install from https://duckdb.org/docs/installation or via Homebrew: `brew install duckdb`)
 - dbt 1.9+
+
+Note: The DuckDB CLI is required for running database commands directly in the terminal. This is separate from the Python duckdb package used by the load script.
 
 ### Installation
 
@@ -52,6 +54,30 @@ The project is configured to use a local DuckDB database file. No additional dat
 To verify your setup:
 ```bash
 dbt debug
+```
+
+## Loading GTFS Data
+
+Before running dbt models, you need to load GTFS data into your local DuckDB database:
+
+1. Ensure you have the required Python packages:
+```bash
+uv pip install requests pandas duckdb
+```
+
+2. Run the load_gtfs.py script with a GTFS feed URL:
+```bash
+python load_gtfs.py [your GTFS feed URL]
+```
+
+This will:
+- Download the GTFS feed
+- Create a local DuckDB database file (transit_dbt_sandbox.duckdb)
+- Load core GTFS tables (routes, agency, trips, stops, etc.) into the 'raw' schema
+
+3. Verify the data load:
+```bash
+duckdb transit_dbt_sandbox.duckdb -c "SELECT count(*) FROM raw.routes;"
 ```
 
 ## Development

@@ -22,29 +22,25 @@ models/
 ### Prerequisites
 
 - Python 3.11+
-- uv (package manager)
-- DuckDB CLI (install from https://duckdb.org/docs/installation or via Homebrew: `brew install duckdb`)
+- uv (install with `pip install uv`)
 - dbt 1.9+
+- DuckDB CLI (install from https://duckdb.org/docs/installation or via Homebrew: `brew install duckdb`)
 
 Note: The DuckDB CLI is required for running database commands directly in the terminal. This is separate from the Python duckdb package used by the load script.
 
 ### Installation
 
 1. Clone this repository
-2. Set up a Python virtual environment:
+
+2. Initialize virtual environment and install dependencies from lockfile:
 ```bash
-uv venv .venv
-source .venv/bin/activate
+uv venv
+uv pip sync
 ```
 
-3. Install dependencies:
+3. Install dbt packages:
 ```bash
-uv pip install dbt-core dbt-duckdb
-```
-
-4. Install dbt packages:
-```bash
-dbt deps
+uv run dbt deps
 ```
 
 ### Configuration
@@ -53,21 +49,16 @@ The project is configured to use a local DuckDB database file. No additional dat
 
 To verify your setup:
 ```bash
-dbt debug
+uv run dbt debug
 ```
 
 ## Loading GTFS Data
 
 Before running dbt models, you need to load GTFS data into your local DuckDB database:
 
-1. Ensure you have the required Python packages:
+1. Run the load_gtfs.py script with a GTFS feed URL:
 ```bash
-uv pip install requests pandas duckdb
-```
-
-2. Run the load_gtfs.py script with a GTFS feed URL:
-```bash
-python load_gtfs.py [your GTFS feed URL]
+uv run python load_gtfs.py [your GTFS feed URL]
 ```
 
 This will:
@@ -75,7 +66,7 @@ This will:
 - Create a local DuckDB database file (transit_dbt_sandbox.duckdb)
 - Load core GTFS tables (routes, agency, trips, stops, etc.) into the 'raw' schema
 
-3. Verify the data load:
+2. Verify the data load using DuckDB CLI:
 ```bash
 duckdb transit_dbt_sandbox.duckdb -c "SELECT count(*) FROM raw.routes;"
 ```
@@ -86,19 +77,19 @@ duckdb transit_dbt_sandbox.duckdb -c "SELECT count(*) FROM raw.routes;"
 
 - Run all models:
 ```bash
-dbt run
+uv run dbt run
 ```
 
 - Run specific models:
 ```bash
-dbt run --select staging
-dbt run --select marts
+uv run dbt run --select staging
+uv run dbt run --select marts
 ```
 
 ### Testing
 
 ```bash
-dbt test
+uv run dbt test
 ```
 
 ## Resources

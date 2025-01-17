@@ -1,0 +1,15 @@
+[project]
+name = "transit-dbt-sandbox"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "dbt-core==1.9.1",
+    "dbt-duckdb==1.9.1",
+    "dbt-postgres==1.9.0",
+    "numpy==2.2.1",
+    "pandas==2.2.3",
+    "psycopg2-binary==2.9.10",
+    "pyyaml==6.0.2",
+]

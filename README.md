@@ -4,18 +4,7 @@ This repo contains an example dbt project that can be run locally using public t
 
 ## Project Structure
 
-```
-models/
-├── staging/          # Clean & standardize raw data
-├── intermediate/     # Join and prepare staging models
-└── marts/           # Business-level transformations
-```
-
-### Layers
-
-- **Staging**: One-to-one with source tables, light transformations
-- **Intermediate**: Complex transformations, joining multiple staging models
-- **Marts**: Business-level aggregations and final models
+The project generally follows dbt's [guide on how to structure a dbt project](https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview).
 
 ## Getting Started
 
@@ -64,7 +53,10 @@ uv run python load_gtfs.py [your GTFS feed URL]
 This will:
 - Download the GTFS feed
 - Create a local DuckDB database file (transit_dbt_sandbox.duckdb)
-- Load core GTFS tables (routes, agency, trips, stops, etc.) into the 'raw' schema
+- Load core GTFS tables (routes, agency, trips, stops, etc.) into the 'raw' 
+
+> [!NOTE]  
+> By default, this script will overwrite the tables if they already exist. If you want to append new data into the database, use the `--append` flag: `uv run python load_gtfs.py --append [your GTFS feed URL]`. If the second feed loaded has different fields than the first for a given file, only the first feed's fields will be loaded.  
 
 2. Verify the data load using DuckDB CLI:
 ```bash

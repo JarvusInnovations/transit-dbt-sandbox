@@ -56,7 +56,7 @@ This will:
 - Load core GTFS tables (routes, agency, trips, stops, etc.) into the 'raw' 
 
 > [!NOTE]  
-> By default, this script will overwrite the tables if they already exist. If you want to append new data into the database, use the `--append` flag: `uv run python load_gtfs.py --append [your GTFS feed URL]`. If the second feed loaded has different fields than the first for a given file, only the first feed's fields will be loaded.  
+> By default, this script will overwrite the tables if they already exist. If you want to append new data into the database, use the `--append` flag: `uv run python load_gtfs.py --append [your GTFS feed URL]`.
 
 2. Verify the data load using DuckDB CLI:
 ```bash

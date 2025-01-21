@@ -1,14 +1,18 @@
 version: 2
 
+descriptions: &feed_id_desc "Identifier for this GTFS feed version"
+
 sources:
   - name: raw
     description: Raw GTFS data loaded from transit agency feed. Field documentation copied from https://gtfs.org/documentation/schedule/reference/
     tables:
       - name: agency
         columns:
+          - name: feed_id
+            description: *feed_id_desc
           - name: agency_id
             description: >
-              Identifies a transit brand which is often synonymous with a transit agency. Note that in some cases, such as when a single agency operates multiple separate services, agencies and brands are distinct. This document uses the term "agency" in place of "brand". A dataset may contain data from multiple agencies.
+              Identifies a transit brand which is often synonymous with a transit agency. Note that in some cases, such as when a single agency operates multiple separate services, agencies and brands are distinct. This document uses the term "agency" in place of "brand". A dataset may contain data from multiple agencies. Required when the dataset contains data for multiple transit agencies.
           - name: agency_name
             description: Full name of the transit agency.
           - name: agency_url
@@ -26,6 +30,8 @@ sources:
 
       - name: stops
         columns:
+          - name: feed_id
+            description: *feed_id_desc
           - name: stop_id
             description: >
               Identifies a location: stop/platform, station, entrance/exit, generic node or boarding area. ID must be unique across all stops.stop_id, locations.geojson id, and location_groups.location_group_id values. Multiple routes may use the same stop_id.
@@ -35,6 +41,8 @@ sources:
           - name: stop_name
             description: >
               Name of the location. The stop_name should match the agency's rider-facing name for the location as printed on a timetable, published online, or represented on signage. For translations into other languages, use translations.txt. When the location is a boarding area (location_type=4), the stop_name should contains the name of the boarding area as displayed by the agency. It could be just one letter (like on some European intercity railway stations), or text like "Wheelchair boarding area" (NYC's Subway) or "Head of short trains" (Paris' RER).
+          - name: tts_stop_name
+            description: Readable version of the stop_name. See "Text-to-speech field" in the GTFS Term Definitions for more information.
           - name: stop_desc
             description: Description of the location that provides useful, quality information. Should not be a duplicate of stop_name.
           - name: stop_lat
@@ -77,21 +85,29 @@ sources:
               0 or empty - Station entrance will inherit its wheelchair_boarding behavior from the parent station, if specified for the parent.
               1 - Station entrance is wheelchair accessible.
               2 - No accessible path from station entrance to stops/platforms.
+          - name: stop_timezone
+            description: Timezone of the location. If the location has a parent station, it inherits the parent station's timezone instead of applying its own. Stations and parentless stops with empty stop_timezone inherit the timezone specified by agency.agency_timezone. The times provided in stop_times.txt are in the timezone specified by agency.agency_timezone, not stop_timezone. This ensures that the time values in a trip always increase over the course of a trip, regardless of which timezones the trip crosses.
+          - name: level_id
+            description: Level of the location. The same level may be used by multiple unlinked stations.
+          - name: platform_code
+            description: Platform identifier for a platform stop (a stop belonging to a station). This should be just the platform identifier (eg. "G" or "3"). Words like "platform" or "track" (or the feed's language-specific equivalent) should not be included. This allows feed consumers to more easily internationalize and localize the platform identifier into other languages.
 
       - name: routes
         columns:
+          - name: feed_id
+            description: *feed_id_desc
           - name: route_id
-            description: Identifies a route.
+            description: Identifies a route. Must be unique within the dataset.
           - name: agency_id
-            description: Agency for the specified route.
+            description: Agency for the specified route. This field is required when the dataset contains data for multiple agencies, otherwise it is optional.
           - name: route_short_name
             description: >
-              Short name of a route. Often a short, abstract identifier (e.g., "32", "100X", "Green") that riders use to identify a route. Both route_short_name and route_long_name may be defined.
+              Short name of a route. This will often be a short, abstract identifier like "32", "100X", or "Green" that riders use to identify a route, but which doesn't give any indication of what places the route serves. Either route_short_name or route_long_name must be specified, or potentially both if appropriate.
           - name: route_long_name
             description: >
-              Full name of a route. This name is generally more descriptive than the route_short_name and often includes the route's destination or stop. Both route_short_name and route_long_name may be defined.
+              Full name of a route. This name is generally more descriptive than the route_short_name and often includes the route's destination or stop. Either route_short_name or route_long_name must be specified, or potentially both if appropriate.
           - name: route_desc
-            description: Description of a route that provides useful, quality information. Should not be a duplicate of route_short_name or route_long_name.
+            description: Description of a route that provides useful, quality information. Do not simply duplicate the name of the route.
           - name: route_type
             description: >
               Indicates the type of transportation used on a route. Valid options are:
@@ -108,12 +124,36 @@ sources:
           - name: route_url
             description: URL of a web page about the particular route. Should be different from the agency.agency_url value.
           - name: route_color
-            description: Route color designation that matches public facing material. Defaults to white (FFFFFF) when omitted or left empty. The color difference between route_color and route_text_color should provide sufficient contrast when viewed on a black and white screen.
+            description: >
+              Route color designation that matches public facing material. Defaults to white (FFFFFF) when omitted or left empty. The color difference between route_color and route_text_color should provide sufficient contrast when viewed on a black and white screen.
           - name: route_text_color
-            description: Legible color to use for text drawn against a background of route_color. Defaults to black (000000) when omitted or left empty. The color difference between route_color and route_text_color should provide sufficient contrast when viewed on a black and white screen.
+            description: >
+              Legible color to use for text drawn against a background of route_color. Defaults to black (000000) when omitted or left empty. The color difference between route_color and route_text_color should provide sufficient contrast when viewed on a black and white screen.
+          - name: route_sort_order
+            description: >
+              Orders the routes in a way which is ideal for presentation to customers. Routes with smaller route_sort_order values should be displayed first.
+          - name: continuous_pickup
+            description: >
+              Indicates whether a rider can board the transit vehicle at any point along the vehicle's travel path. Valid options are:
+              0 - Continuous stopping pickup.
+              1 - No continuous stopping pickup.
+              2 - Must phone agency to arrange continuous stopping pickup.
+              3 - Must coordinate with driver to arrange continuous stopping pickup.
+          - name: continuous_drop_off
+            description: >
+              Indicates whether a rider can alight from the transit vehicle at any point along the vehicle's travel path. Valid options are:
+              0 - Continuous stopping drop off.
+              1 - No continuous stopping drop off.
+              2 - Must phone agency to arrange continuous stopping drop off.
+              3 - Must coordinate with driver to arrange continuous stopping drop off.
+          - name: network_id
+            description: >
+              Identifies a group of routes that are shown to riders together as a single service to help riders better understand the transit network. Routes with the same network_id should be shown together on maps, schedules, and other rider materials.
 
       - name: trips
         columns:
+          - name: feed_id
+            description: *feed_id_desc
           - name: route_id
             description: Identifies a route.
           - name: service_id
@@ -135,7 +175,8 @@ sources:
             description: >
               Identifies the block to which the trip belongs. A block consists of a single trip or many sequential trips made using the same vehicle, defined by shared service days and block_id. A block_id may have trips with different service days, making distinct blocks.
           - name: shape_id
-            description: Identifies a geospatial shape describing the vehicle travel path for a trip.
+            description: >
+              Identifies a geospatial shape describing the vehicle travel path for a trip. Required if the trip has continuous pickup or drop-off behavior defined either in routes.txt or in stop_times.txt.
           - name: wheelchair_accessible
             description: >
               Indicates wheelchair accessibility. Valid options are:
@@ -151,17 +192,19 @@ sources:
 
       - name: stop_times
         columns:
+          - name: feed_id
+            description: *feed_id_desc
           - name: trip_id
             description: Identifies a trip.
           - name: arrival_time
             description: >
-              Arrival time at the stop (defined by stop_times.stop_id) for a specific trip (defined by stop_times.trip_id) in the time zone specified by agency.agency_timezone, not stops.stop_timezone. If there are not separate times for arrival and departure at a stop, arrival_time and departure_time should be the same. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS. If exact arrival and departure times (timepoint=1) are not available, estimated or interpolated arrival and departure times (timepoint=0) should be provided.
+              Arrival time at the stop (defined by stop_times.stop_id) for a specific trip (defined by stop_times.trip_id) in the time zone specified by agency.agency_timezone, not stops.stop_timezone. If there are not separate times for arrival and departure at a stop, arrival_time and departure_time should be the same. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS. If exact arrival and departure times (timepoint=1) are not available, estimated or interpolated arrival and departure times (timepoint=0) should be provided. Required for the first and last stop in a trip, required for timepoint=1, forbidden when start_pickup_drop_off_window or end_pickup_drop_off_window are defined, optional otherwise.
           - name: departure_time
             description: >
-              Departure time from the stop (defined by stop_times.stop_id) for a specific trip (defined by stop_times.trip_id) in the time zone specified by agency.agency_timezone, not stops.stop_timezone. If there are not separate times for arrival and departure at a stop, arrival_time and departure_time should be the same. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS. If exact arrival and departure times (timepoint=1) are not available, estimated or interpolated arrival and departure times (timepoint=0) should be provided.
+              Departure time from the stop (defined by stop_times.stop_id) for a specific trip (defined by stop_times.trip_id) in the time zone specified by agency.agency_timezone, not stops.stop_timezone. If there are not separate times for arrival and departure at a stop, arrival_time and departure_time should be the same. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS. If exact arrival and departure times (timepoint=1) are not available, estimated or interpolated arrival and departure times (timepoint=0) should be provided. Required for timepoint=1, forbidden when start_pickup_drop_off_window or end_pickup_drop_off_window are defined, optional otherwise.
           - name: stop_id
             description: >
-              Identifies the serviced stop. All stops serviced during a trip must have a record in stop_times.txt. Referenced locations must be stops/platforms, i.e. their stops.location_type value must be 0 or empty. A stop may be serviced multiple times in the same trip, and multiple trips and routes may service the same stop.
+              Identifies the serviced stop. All stops serviced during a trip must have a record in stop_times.txt. Referenced locations must be stops/platforms, i.e. their stops.location_type value must be 0 or empty. A stop may be serviced multiple times in the same trip, and multiple trips and routes may service the same stop. Required if location_group_id AND location_id are NOT defined. Forbidden if location_group_id or location_id are defined.
           - name: stop_sequence
             description: Order of stops for a particular trip. The values must increase along the trip but do not need to be consecutive.
           - name: stop_headsign
@@ -189,9 +232,37 @@ sources:
               Indicates if arrival and departure times for a stop are strictly adhered to by the vehicle or if they are instead approximate and/or interpolated times. This field allows a GTFS producer to provide interpolated stop-times, while indicating that the times are approximate. Valid options are:
               0 - Times are considered approximate.
               1 - Times are considered exact.
+          - name: start_pickup_drop_off_window
+            description: >
+              Time that on-demand service becomes available in a GeoJSON location, location group, or stop. Required if location_group_id or location_id is defined, required if end_pickup_drop_off_window is defined, forbidden if arrival_time or departure_time is defined, optional otherwise.
+          - name: end_pickup_drop_off_window
+            description: >
+              Time that on-demand service ends in a GeoJSON location, location group, or stop. Required if location_group_id or location_id is defined, required if start_pickup_drop_off_window is defined, forbidden if arrival_time or departure_time is defined, optional otherwise.
+          - name: continuous_pickup
+            description: >
+              Indicates that the rider can board the transit vehicle at any point along the vehicle's travel path as described by shapes.txt, from this stop_time to the next stop_time in the trip's stop_sequence. Valid options are:
+              0 - Continuous stopping pickup.
+              1 or empty - No continuous stopping pickup.
+              2 - Must phone agency to arrange continuous stopping pickup.
+              3 - Must coordinate with driver to arrange continuous stopping pickup.
+              If this field is populated, it overrides any continuous pickup behavior defined in routes.txt. If this field is empty, the stop_time inherits any continuous pickup behavior defined in routes.txt. Forbidden if start_pickup_drop_off_window or end_pickup_drop_off_window are defined.
+          - name: continuous_drop_off
+            description: >
+              Indicates that the rider can alight from the transit vehicle at any point along the vehicle's travel path as described by shapes.txt, from this stop_time to the next stop_time in the trip's stop_sequence. Valid options are:
+              0 - Continuous stopping drop off.
+              1 or empty - No continuous stopping drop off.
+              2 - Must phone agency to arrange continuous stopping drop off.
+              3 - Must coordinate with driver to arrange continuous stopping drop off.
+              If this field is populated, it overrides any continuous drop-off behavior defined in routes.txt. If this field is empty, the stop_time inherits any continuous drop-off behavior defined in routes.txt. Forbidden if start_pickup_drop_off_window or end_pickup_drop_off_window are defined.
+          - name: pickup_booking_rule_id
+            description: Identifies the boarding booking rule at this stop time. Recommended when pickup_type=2.
+          - name: drop_off_booking_rule_id
+            description: Identifies the alighting booking rule at this stop time. Recommended when drop_off_type=2.
 
       - name: calendar
         columns:
+          - name: feed_id
+            description: *feed_id_desc
           - name: service_id
             description: Identifies a set of dates when service is available for one or more routes.
           - name: monday
@@ -218,6 +289,8 @@ sources:
 
       - name: calendar_dates
         columns:
+          - name: feed_id
+            description: *feed_id_desc
           - name: service_id
             description: >
               Identifies a set of dates when a service exception occurs for one or more routes. Each (service_id, date) pair may only appear once in calendar_dates.txt if using calendar.txt and calendar_dates.txt in conjunction. If a service_id value appears in both calendar.txt and calendar_dates.txt, the information in calendar_dates.txt modifies the service information specified in calendar.txt.

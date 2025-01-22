@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: fct_service_calendar
+    description: >
+      A fact table containing all dates when transit service is available.
+      Combines schedule information from GTFS calendar and calendar_dates.
+      Only includes dates where service is available for the given service_id. 
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - _feed_id
+            - service_id
+            - service_date
+    columns:
+      - name: _feed_id
+        description: '{{ doc("feed_id_desc") }}'
+
+      - name: service_id
+        description: '{{ doc("calendar_service_id") }}'
+
+      - name: service_date
+        description: The date when service is available
+
+      - name: day_of_week
+        description: >
+          The lowercase day of week for this date (monday, tuesday, wednesday, thursday, friday, saturday, sunday).
+        tests:
+          - accepted_values:
+              values: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+

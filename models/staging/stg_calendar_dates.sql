@@ -5,9 +5,9 @@ WITH calendar_dates_src AS (
 
 stg_calendar_dates AS (
     SELECT 
-        feed_id,
+        feed_id AS _feed_id,
         service_id,
-        date,
+        STRPTIME(date, '%Y%m%d') AS date,
         exception_type
     FROM calendar_dates_src
 )

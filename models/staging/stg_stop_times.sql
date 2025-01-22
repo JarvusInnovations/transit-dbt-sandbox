@@ -5,7 +5,7 @@ WITH stop_times_src AS (
 
 stg_stop_times AS (
     SELECT 
-        feed_id,
+        feed_id AS _feed_id,
         trip_id,
         arrival_time,
         departure_time,

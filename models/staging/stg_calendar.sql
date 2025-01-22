@@ -5,17 +5,17 @@ WITH calendar_src AS (
 
 stg_calendar AS (
     SELECT 
-        feed_id,
+        feed_id AS _feed_id,
         service_id,
-        monday,
-        tuesday,
-        wednesday,
-        thursday,
-        friday,
-        saturday,
-        sunday,
-        start_date,
-        end_date
+        CAST(monday AS BOOLEAN) AS monday,
+        CAST(tuesday AS BOOLEAN) AS tuesday,
+        CAST(wednesday AS BOOLEAN) AS wednesday,
+        CAST(thursday AS BOOLEAN) AS thursday,
+        CAST(friday AS BOOLEAN) AS friday,
+        CAST(saturday AS BOOLEAN) AS saturday,
+        CAST(sunday AS BOOLEAN) AS sunday,
+        STRPTIME(start_date, '%Y%m%d') as start_date,
+        STRPTIME(end_date, '%Y%m%d') as end_date
     FROM calendar_src
 )
 

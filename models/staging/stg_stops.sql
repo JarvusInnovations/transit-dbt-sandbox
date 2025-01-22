@@ -5,7 +5,7 @@ WITH stops_src AS (
 
 stg_stops AS (
     SELECT 
-        feed_id,
+        feed_id AS _feed_id,
         stop_id,
         stop_code,
         stop_name,

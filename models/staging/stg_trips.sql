@@ -5,7 +5,7 @@ WITH trips_src AS (
 
 stg_trips AS (
     SELECT 
-        feed_id,
+        feed_id AS _feed_id,
         route_id,
         service_id,
         trip_id,

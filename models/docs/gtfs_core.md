@@ -175,3 +175,168 @@ Indicates whether service is available on the date specified in the date field. 
 1 - Service has been added for the specified date.
 2 - Service has been removed for the specified date.
 {% enddocs %}
+
+{% docs stops_stop_id %}
+Identifies a location: stop/platform, station, entrance/exit, generic node or boarding area. ID must be unique across all stops.stop_id, locations.geojson id, and location_groups.location_group_id values. Multiple routes may use the same stop_id.
+{% enddocs %}
+
+{% docs stops_stop_code %}
+Short text or a number that identifies the location for riders. These codes are often used in phone-based transit information systems or printed on signage to make it easier for riders to get information for a particular location. The stop_code may be the same as stop_id if it is public facing. This field should be left empty for locations without a code presented to riders.
+{% enddocs %}
+
+{% docs stops_stop_name %}
+Name of the location. The stop_name should match the agency's rider-facing name for the location as printed on a timetable, published online, or represented on signage. For translations into other languages, use translations.txt. When the location is a boarding area (location_type=4), the stop_name should contains the name of the boarding area as displayed by the agency. It could be just one letter (like on some European intercity railway stations), or text like "Wheelchair boarding area" (NYC's Subway) or "Head of short trains" (Paris' RER).
+{% enddocs %}
+
+{% docs stops_tts_stop_name %}
+Readable version of the stop_name. See "Text-to-speech field" in the GTFS Term Definitions for more information.
+{% enddocs %}
+
+{% docs stops_stop_desc %}
+Description of the location that provides useful, quality information. Should not be a duplicate of stop_name.
+{% enddocs %}
+
+{% docs stops_stop_lat %}
+Latitude of the location. For stops/platforms (location_type=0) and boarding area (location_type=4), the coordinates must be the ones of the bus pole — if exists — and otherwise of where the travelers are boarding the vehicle (on the sidewalk or the platform, and not on the roadway or the track where the vehicle stops).
+{% enddocs %}
+
+{% docs stops_stop_lon %}
+Longitude of the location. For stops/platforms (location_type=0) and boarding area (location_type=4), the coordinates must be the ones of the bus pole — if exists — and otherwise of where the travelers are boarding the vehicle (on the sidewalk or the platform, and not on the roadway or the track where the vehicle stops).
+{% enddocs %}
+
+{% docs stops_zone_id %}
+Identifies the fare zone for a stop. If this record represents a station or station entrance, the zone_id is ignored.
+{% enddocs %}
+
+{% docs stops_stop_url %}
+URL of a web page about the location. This should be different from the agency.agency_url and the routes.route_url field values.
+{% enddocs %}
+
+{% docs stops_location_type %}
+Location type. Valid options are:
+0 (or empty) - Stop (or Platform). A location where passengers board or disembark from a transit vehicle. Is called a platform when defined within a parent_station.
+1 - Station. A physical structure or area that contains one or more platform.
+2 - Entrance/Exit. A location where passengers can enter or exit a station from the street. If an entrance/exit belongs to multiple stations, it may be linked by pathways to both, but the data provider must pick one of them as parent.
+3 - Generic Node. A location within a station, not matching any other location_type, that may be used to link together pathways define in pathways.txt.
+4 - Boarding Area. A specific location on a platform, where passengers can board and/or alight vehicles.
+{% enddocs %}
+
+{% docs stops_parent_station %}
+Defines hierarchy between the different locations defined in stops.txt. It contains the ID of the parent location, as followed:
+- Stop/platform (location_type=0): the parent_station field contains the ID of a station.
+- Station (location_type=1): this field must be empty.
+- Entrance/exit (location_type=2) or generic node (location_type=3): the parent_station field contains the ID of a station (location_type=1)
+- Boarding Area (location_type=4): the parent_station field contains ID of a platform.
+{% enddocs %}
+
+{% docs stops_wheelchair_boarding %}
+Indicates whether wheelchair boardings are possible from the location. Valid options are:
+For parentless stops:
+0 or empty - No accessibility information for the stop.
+1 - Some vehicles at this stop can be boarded by a rider in a wheelchair.
+2 - Wheelchair boarding is not possible at this stop.
+For child stops:
+0 or empty - Stop will inherit its wheelchair_boarding behavior from the parent station, if specified in the parent.
+1 - There exists some accessible path from outside the station to the specific stop/platform.
+2 - There exists no accessible path from outside the station to the specific stop/platform.
+For station entrances/exits:
+0 or empty - Station entrance will inherit its wheelchair_boarding behavior from the parent station, if specified for the parent.
+1 - Station entrance is wheelchair accessible.
+2 - No accessible path from station entrance to stops/platforms.
+{% enddocs %}
+
+{% docs stops_stop_timezone %}
+Timezone of the location. If the location has a parent station, it inherits the parent station's timezone instead of applying its own. Stations and parentless stops with empty stop_timezone inherit the timezone specified by agency.agency_timezone. The times provided in stop_times.txt are in the timezone specified by agency.agency_timezone, not stop_timezone. This ensures that the time values in a trip always increase over the course of a trip, regardless of which timezones the trip crosses.
+{% enddocs %}
+
+{% docs stops_level_id %}
+Level of the location. The same level may be used by multiple unlinked stations.
+{% enddocs %}
+
+{% docs stops_platform_code %}
+Platform identifier for a platform stop (a stop belonging to a station). This should be just the platform identifier (eg. "G" or "3"). Words like "platform" or "track" (or the feed's language-specific equivalent) should not be included. This allows feed consumers to more easily internationalize and localize the platform identifier into other languages.
+{% enddocs %}
+
+{% docs stop_times_trip_id %}
+Identifies a trip.
+{% enddocs %}
+
+{% docs stop_times_arrival_time %}
+Arrival time at the stop (defined by stop_times.stop_id) for a specific trip (defined by stop_times.trip_id) in the time zone specified by agency.agency_timezone, not stops.stop_timezone. If there are not separate times for arrival and departure at a stop, arrival_time and departure_time should be the same. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS. If exact arrival and departure times (timepoint=1) are not available, estimated or interpolated arrival and departure times (timepoint=0) should be provided. Required for the first and last stop in a trip, required for timepoint=1, forbidden when start_pickup_drop_off_window or end_pickup_drop_off_window are defined, optional otherwise.
+{% enddocs %}
+
+{% docs stop_times_departure_time %}
+Departure time from the stop (defined by stop_times.stop_id) for a specific trip (defined by stop_times.trip_id) in the time zone specified by agency.agency_timezone, not stops.stop_timezone. If there are not separate times for arrival and departure at a stop, arrival_time and departure_time should be the same. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS. If exact arrival and departure times (timepoint=1) are not available, estimated or interpolated arrival and departure times (timepoint=0) should be provided. Required for timepoint=1, forbidden when start_pickup_drop_off_window or end_pickup_drop_off_window are defined, optional otherwise.
+{% enddocs %}
+
+{% docs stop_times_stop_id %}
+Identifies the serviced stop. All stops serviced during a trip must have a record in stop_times.txt. Referenced locations must be stops/platforms, i.e. their stops.location_type value must be 0 or empty. A stop may be serviced multiple times in the same trip, and multiple trips and routes may service the same stop. Required if location_group_id AND location_id are NOT defined. Forbidden if location_group_id or location_id are defined.
+{% enddocs %}
+
+{% docs stop_times_stop_sequence %}
+Order of stops for a particular trip. The values must increase along the trip but do not need to be consecutive.
+{% enddocs %}
+
+{% docs stop_times_stop_headsign %}
+Text that appears on signage identifying the trip's destination to riders. This field overrides the default trips.trip_headsign when the headsign changes between stops. If the headsign is displayed for an entire trip, trips.trip_headsign should be used instead. A stop_headsign value specified for one stop_time does not apply to subsequent stop_times in the same trip. If you want to override the trip_headsign for multiple stop_times in the same trip, the stop_headsign value must be repeated in each stop_time row.
+{% enddocs %}
+
+{% docs stop_times_pickup_type %}
+Indicates pickup method. Valid options are:
+0 or empty - Regularly scheduled pickup.
+1 - No pickup available.
+2 - Must phone agency to arrange pickup.
+3 - Must coordinate with driver to arrange pickup.
+{% enddocs %}
+
+{% docs stop_times_drop_off_type %}
+Indicates drop off method. Valid options are:
+0 or empty - Regularly scheduled drop off.
+1 - No drop off available.
+2 - Must phone agency to arrange drop off.
+3 - Must coordinate with driver to arrange drop off.
+{% enddocs %}
+
+{% docs stop_times_shape_dist_traveled %}
+Actual distance traveled along the associated shape, from the first stop to the stop specified in this record. This field specifies how much of the shape to draw between any two stops during a trip. Must be in the same units used in shapes.txt. Values used for shape_dist_traveled must increase along with stop_sequence; they must not be used to show reverse travel along a route.
+{% enddocs %}
+
+{% docs stop_times_timepoint %}
+Indicates if arrival and departure times for a stop are strictly adhered to by the vehicle or if they are instead approximate and/or interpolated times. This field allows a GTFS producer to provide interpolated stop-times, while indicating that the times are approximate. Valid options are:
+0 - Times are considered approximate.
+1 - Times are considered exact.
+{% enddocs %}
+
+{% docs stop_times_start_pickup_drop_off_window %}
+Time that on-demand service becomes available in a GeoJSON location, location group, or stop. Required if location_group_id or location_id is defined, required if end_pickup_drop_off_window is defined, forbidden if arrival_time or departure_time is defined, optional otherwise.
+{% enddocs %}
+
+{% docs stop_times_end_pickup_drop_off_window %}
+Time that on-demand service ends in a GeoJSON location, location group, or stop. Required if location_group_id or location_id is defined, required if start_pickup_drop_off_window is defined, forbidden if arrival_time or departure_time is defined, optional otherwise.
+{% enddocs %}
+
+{% docs stop_times_continuous_pickup %}
+Indicates that the rider can board the transit vehicle at any point along the vehicle's travel path as described by shapes.txt, from this stop_time to the next stop_time in the trip's stop_sequence. Valid options are:
+0 - Continuous stopping pickup.
+1 or empty - No continuous stopping pickup.
+2 - Must phone agency to arrange continuous stopping pickup.
+3 - Must coordinate with driver to arrange continuous stopping pickup.
+If this field is populated, it overrides any continuous pickup behavior defined in routes.txt. If this field is empty, the stop_time inherits any continuous pickup behavior defined in routes.txt. Forbidden if start_pickup_drop_off_window or end_pickup_drop_off_window are defined.
+{% enddocs %}
+
+{% docs stop_times_continuous_drop_off %}
+Indicates that the rider can alight from the transit vehicle at any point along the vehicle's travel path as described by shapes.txt, from this stop_time to the next stop_time in the trip's stop_sequence. Valid options are:
+0 - Continuous stopping drop off.
+1 or empty - No continuous stopping drop off.
+2 - Must phone agency to arrange continuous stopping drop off.
+3 - Must coordinate with driver to arrange continuous stopping drop off.
+If this field is populated, it overrides any continuous drop-off behavior defined in routes.txt. If this field is empty, the stop_time inherits any continuous drop-off behavior defined in routes.txt. Forbidden if start_pickup_drop_off_window or end_pickup_drop_off_window are defined.
+{% enddocs %}
+
+{% docs stop_times_pickup_booking_rule_id %}
+Identifies the boarding booking rule at this stop time. Recommended when pickup_type=2.
+{% enddocs %}
+
+{% docs stop_times_drop_off_booking_rule_id %}
+Identifies the alighting booking rule at this stop time. Recommended when drop_off_type=2.
+{% enddocs %}

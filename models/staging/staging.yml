@@ -96,3 +96,77 @@ models:
         description: '{{ doc("calendar_dates_date") }}'
       - name: exception_type
         description: '{{ doc("calendar_dates_exception_type") }}'
+
+  - name: stg_stops
+    description: Staging layer for stops data from GTFS feed
+    columns:
+      - name: feed_id
+        description: '{{ doc("feed_id_desc") }}'
+      - name: stop_id
+        description: '{{ doc("stops_stop_id") }}'
+      - name: stop_code
+        description: '{{ doc("stops_stop_code") }}'
+      - name: stop_name
+        description: '{{ doc("stops_stop_name") }}'
+      - name: tts_stop_name
+        description: '{{ doc("stops_tts_stop_name") }}'
+      - name: stop_desc
+        description: '{{ doc("stops_stop_desc") }}'
+      - name: stop_lat
+        description: '{{ doc("stops_stop_lat") }}'
+      - name: stop_lon
+        description: '{{ doc("stops_stop_lon") }}'
+      - name: zone_id
+        description: '{{ doc("stops_zone_id") }}'
+      - name: stop_url
+        description: '{{ doc("stops_stop_url") }}'
+      - name: location_type
+        description: '{{ doc("stops_location_type") }}'
+      - name: parent_station
+        description: '{{ doc("stops_parent_station") }}'
+      - name: wheelchair_boarding
+        description: '{{ doc("stops_wheelchair_boarding") }}'
+      - name: stop_timezone
+        description: '{{ doc("stops_stop_timezone") }}'
+      - name: level_id
+        description: '{{ doc("stops_level_id") }}'
+      - name: platform_code
+        description: '{{ doc("stops_platform_code") }}'
+
+  - name: stg_stop_times
+    description: Staging layer for stop times data from GTFS feed
+    columns:
+      - name: feed_id
+        description: '{{ doc("feed_id_desc") }}'
+      - name: trip_id
+        description: '{{ doc("stop_times_trip_id") }}'
+      - name: arrival_time
+        description: '{{ doc("stop_times_arrival_time") }}'
+      - name: departure_time
+        description: '{{ doc("stop_times_departure_time") }}'
+      - name: stop_id
+        description: '{{ doc("stop_times_stop_id") }}'
+      - name: stop_sequence
+        description: '{{ doc("stop_times_stop_sequence") }}'
+      - name: stop_headsign
+        description: '{{ doc("stop_times_stop_headsign") }}'
+      - name: pickup_type
+        description: '{{ doc("stop_times_pickup_type") }}'
+      - name: drop_off_type
+        description: '{{ doc("stop_times_drop_off_type") }}'
+      - name: shape_dist_traveled
+        description: '{{ doc("stop_times_shape_dist_traveled") }}'
+      - name: timepoint
+        description: '{{ doc("stop_times_timepoint") }}'
+      - name: start_pickup_drop_off_window
+        description: '{{ doc("stop_times_start_pickup_drop_off_window") }}'
+      - name: end_pickup_drop_off_window
+        description: '{{ doc("stop_times_end_pickup_drop_off_window") }}'
+      - name: continuous_pickup
+        description: '{{ doc("stop_times_continuous_pickup") }}'
+      - name: continuous_drop_off
+        description: '{{ doc("stop_times_continuous_drop_off") }}'
+      - name: pickup_booking_rule_id
+        description: '{{ doc("stop_times_pickup_booking_rule_id") }}'
+      - name: drop_off_booking_rule_id
+        description: '{{ doc("stop_times_drop_off_booking_rule_id") }}'

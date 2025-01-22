@@ -9,7 +9,7 @@ sources:
     description: Raw GTFS data loaded from transit agency feed. Field documentation copied from https://gtfs.org/documentation/schedule/reference/
     tables:
       - name: agency
-        tests:
+        data_tests:
         - dbt_utils.unique_combination_of_columns:
             combination_of_columns:
               - feed_id
@@ -36,7 +36,7 @@ sources:
             description: Email address actively monitored by the agency's customer service department. This email address should be a direct contact point where transit riders can reach a customer service representative at the agency.
 
       - name: stops
-        tests:
+        data_tests:
         - dbt_utils.unique_combination_of_columns:
             combination_of_columns:
               - feed_id
@@ -45,67 +45,38 @@ sources:
           - name: feed_id
             description: *feed_id_desc
           - name: stop_id
-            description: >
-              Identifies a location: stop/platform, station, entrance/exit, generic node or boarding area. ID must be unique across all stops.stop_id, locations.geojson id, and location_groups.location_group_id values. Multiple routes may use the same stop_id.
+            description: '{{ doc("stops_stop_id") }}'
           - name: stop_code
-            description: >
-              Short text or a number that identifies the location for riders. These codes are often used in phone-based transit information systems or printed on signage to make it easier for riders to get information for a particular location. The stop_code may be the same as stop_id if it is public facing. This field should be left empty for locations without a code presented to riders.
+            description: '{{ doc("stops_stop_code") }}'
           - name: stop_name
-            description: >
-              Name of the location. The stop_name should match the agency's rider-facing name for the location as printed on a timetable, published online, or represented on signage. For translations into other languages, use translations.txt. When the location is a boarding area (location_type=4), the stop_name should contains the name of the boarding area as displayed by the agency. It could be just one letter (like on some European intercity railway stations), or text like "Wheelchair boarding area" (NYC's Subway) or "Head of short trains" (Paris' RER).
+            description: '{{ doc("stops_stop_name") }}'
           - name: tts_stop_name
-            description: Readable version of the stop_name. See "Text-to-speech field" in the GTFS Term Definitions for more information.
+            description: '{{ doc("stops_tts_stop_name") }}'
           - name: stop_desc
-            description: Description of the location that provides useful, quality information. Should not be a duplicate of stop_name.
+            description: '{{ doc("stops_stop_desc") }}'
           - name: stop_lat
-            description: >
-              Latitude of the location. For stops/platforms (location_type=0) and boarding area (location_type=4), the coordinates must be the ones of the bus pole — if exists — and otherwise of where the travelers are boarding the vehicle (on the sidewalk or the platform, and not on the roadway or the track where the vehicle stops).
+            description: '{{ doc("stops_stop_lat") }}'
           - name: stop_lon
-            description: >
-              Longitude of the location. For stops/platforms (location_type=0) and boarding area (location_type=4), the coordinates must be the ones of the bus pole — if exists — and otherwise of where the travelers are boarding the vehicle (on the sidewalk or the platform, and not on the roadway or the track where the vehicle stops).
+            description: '{{ doc("stops_stop_lon") }}'
           - name: zone_id
-            description: Identifies the fare zone for a stop. If this record represents a station or station entrance, the zone_id is ignored.
+            description: '{{ doc("stops_zone_id") }}'
           - name: stop_url
-            description: URL of a web page about the location. This should be different from the agency.agency_url and the routes.route_url field values.
+            description: '{{ doc("stops_stop_url") }}'
           - name: location_type
-            description: >
-              Location type. Valid options are:
-              0 (or empty) - Stop (or Platform). A location where passengers board or disembark from a transit vehicle. Is called a platform when defined within a parent_station.
-              1 - Station. A physical structure or area that contains one or more platform.
-              2 - Entrance/Exit. A location where passengers can enter or exit a station from the street. If an entrance/exit belongs to multiple stations, it may be linked by pathways to both, but the data provider must pick one of them as parent.
-              3 - Generic Node. A location within a station, not matching any other location_type, that may be used to link together pathways define in pathways.txt.
-              4 - Boarding Area. A specific location on a platform, where passengers can board and/or alight vehicles.
+            description: '{{ doc("stops_location_type") }}'
           - name: parent_station
-            description: >
-              Defines hierarchy between the different locations defined in stops.txt. It contains the ID of the parent location, as followed:
-              - Stop/platform (location_type=0): the parent_station field contains the ID of a station.
-              - Station (location_type=1): this field must be empty.
-              - Entrance/exit (location_type=2) or generic node (location_type=3): the parent_station field contains the ID of a station (location_type=1)
-              - Boarding Area (location_type=4): the parent_station field contains ID of a platform.
+            description: '{{ doc("stops_parent_station") }}'
           - name: wheelchair_boarding
-            description: >
-              Indicates whether wheelchair boardings are possible from the location. Valid options are:
-              For parentless stops:
-              0 or empty - No accessibility information for the stop.
-              1 - Some vehicles at this stop can be boarded by a rider in a wheelchair.
-              2 - Wheelchair boarding is not possible at this stop.
-              For child stops:
-              0 or empty - Stop will inherit its wheelchair_boarding behavior from the parent station, if specified in the parent.
-              1 - There exists some accessible path from outside the station to the specific stop/platform.
-              2 - There exists no accessible path from outside the station to the specific stop/platform.
-              For station entrances/exits:
-              0 or empty - Station entrance will inherit its wheelchair_boarding behavior from the parent station, if specified for the parent.
-              1 - Station entrance is wheelchair accessible.
-              2 - No accessible path from station entrance to stops/platforms.
+            description: '{{ doc("stops_wheelchair_boarding") }}'
           - name: stop_timezone
-            description: Timezone of the location. If the location has a parent station, it inherits the parent station's timezone instead of applying its own. Stations and parentless stops with empty stop_timezone inherit the timezone specified by agency.agency_timezone. The times provided in stop_times.txt are in the timezone specified by agency.agency_timezone, not stop_timezone. This ensures that the time values in a trip always increase over the course of a trip, regardless of which timezones the trip crosses.
+            description: '{{ doc("stops_stop_timezone") }}'
           - name: level_id
-            description: Level of the location. The same level may be used by multiple unlinked stations.
+            description: '{{ doc("stops_level_id") }}'
           - name: platform_code
-            description: Platform identifier for a platform stop (a stop belonging to a station). This should be just the platform identifier (eg. "G" or "3"). Words like "platform" or "track" (or the feed's language-specific equivalent) should not be included. This allows feed consumers to more easily internationalize and localize the platform identifier into other languages.
+            description: '{{ doc("stops_platform_code") }}'
 
       - name: routes
-        tests:
+        data_tests:
         - dbt_utils.unique_combination_of_columns:
             combination_of_columns:
               - feed_id
@@ -141,7 +112,7 @@ sources:
             description: '{{ doc("routes_network_id") }}'
 
       - name: trips
-        tests:
+        data_tests:
         - dbt_utils.unique_combination_of_columns:
             combination_of_columns:
               - feed_id
@@ -171,7 +142,7 @@ sources:
             description: '{{ doc("trips_bikes_allowed") }}'
 
       - name: stop_times
-        tests:
+        data_tests:
         - dbt_utils.unique_combination_of_columns:
             combination_of_columns:
               - feed_id
@@ -181,72 +152,40 @@ sources:
           - name: feed_id
             description: *feed_id_desc
           - name: trip_id
-            description: Identifies a trip.
+            description: '{{ doc("stop_times_trip_id") }}'
           - name: arrival_time
-            description: >
-              Arrival time at the stop (defined by stop_times.stop_id) for a specific trip (defined by stop_times.trip_id) in the time zone specified by agency.agency_timezone, not stops.stop_timezone. If there are not separate times for arrival and departure at a stop, arrival_time and departure_time should be the same. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS. If exact arrival and departure times (timepoint=1) are not available, estimated or interpolated arrival and departure times (timepoint=0) should be provided. Required for the first and last stop in a trip, required for timepoint=1, forbidden when start_pickup_drop_off_window or end_pickup_drop_off_window are defined, optional otherwise.
+            description: '{{ doc("stop_times_arrival_time") }}'
           - name: departure_time
-            description: >
-              Departure time from the stop (defined by stop_times.stop_id) for a specific trip (defined by stop_times.trip_id) in the time zone specified by agency.agency_timezone, not stops.stop_timezone. If there are not separate times for arrival and departure at a stop, arrival_time and departure_time should be the same. For times occurring after midnight on the service day, enter the time as a value greater than 24:00:00 in HH:MM:SS. If exact arrival and departure times (timepoint=1) are not available, estimated or interpolated arrival and departure times (timepoint=0) should be provided. Required for timepoint=1, forbidden when start_pickup_drop_off_window or end_pickup_drop_off_window are defined, optional otherwise.
+            description: '{{ doc("stop_times_departure_time") }}'
           - name: stop_id
-            description: >
-              Identifies the serviced stop. All stops serviced during a trip must have a record in stop_times.txt. Referenced locations must be stops/platforms, i.e. their stops.location_type value must be 0 or empty. A stop may be serviced multiple times in the same trip, and multiple trips and routes may service the same stop. Required if location_group_id AND location_id are NOT defined. Forbidden if location_group_id or location_id are defined.
+            description: '{{ doc("stop_times_stop_id") }}'
           - name: stop_sequence
-            description: Order of stops for a particular trip. The values must increase along the trip but do not need to be consecutive.
+            description: '{{ doc("stop_times_stop_sequence") }}'
           - name: stop_headsign
-            description: >
-              Text that appears on signage identifying the trip's destination to riders. This field overrides the default trips.trip_headsign when the headsign changes between stops. If the headsign is displayed for an entire trip, trips.trip_headsign should be used instead. A stop_headsign value specified for one stop_time does not apply to subsequent stop_times in the same trip. If you want to override the trip_headsign for multiple stop_times in the same trip, the stop_headsign value must be repeated in each stop_time row.
+            description: '{{ doc("stop_times_stop_headsign") }}'
           - name: pickup_type
-            description: >
-              Indicates pickup method. Valid options are:
-              0 or empty - Regularly scheduled pickup.
-              1 - No pickup available.
-              2 - Must phone agency to arrange pickup.
-              3 - Must coordinate with driver to arrange pickup.
+            description: '{{ doc("stop_times_pickup_type") }}'
           - name: drop_off_type
-            description: >
-              Indicates drop off method. Valid options are:
-              0 or empty - Regularly scheduled drop off.
-              1 - No drop off available.
-              2 - Must phone agency to arrange drop off.
-              3 - Must coordinate with driver to arrange drop off.
+            description: '{{ doc("stop_times_drop_off_type") }}'
           - name: shape_dist_traveled
-            description: >
-              Actual distance traveled along the associated shape, from the first stop to the stop specified in this record. This field specifies how much of the shape to draw between any two stops during a trip. Must be in the same units used in shapes.txt. Values used for shape_dist_traveled must increase along with stop_sequence; they must not be used to show reverse travel along a route.
+            description: '{{ doc("stop_times_shape_dist_traveled") }}'
           - name: timepoint
-            description: >
-              Indicates if arrival and departure times for a stop are strictly adhered to by the vehicle or if they are instead approximate and/or interpolated times. This field allows a GTFS producer to provide interpolated stop-times, while indicating that the times are approximate. Valid options are:
-              0 - Times are considered approximate.
-              1 - Times are considered exact.
+            description: '{{ doc("stop_times_timepoint") }}'
           - name: start_pickup_drop_off_window
-            description: >
-              Time that on-demand service becomes available in a GeoJSON location, location group, or stop. Required if location_group_id or location_id is defined, required if end_pickup_drop_off_window is defined, forbidden if arrival_time or departure_time is defined, optional otherwise.
+            description: '{{ doc("stop_times_start_pickup_drop_off_window") }}'
           - name: end_pickup_drop_off_window
-            description: >
-              Time that on-demand service ends in a GeoJSON location, location group, or stop. Required if location_group_id or location_id is defined, required if start_pickup_drop_off_window is defined, forbidden if arrival_time or departure_time is defined, optional otherwise.
+            description: '{{ doc("stop_times_end_pickup_drop_off_window") }}'
           - name: continuous_pickup
-            description: >
-              Indicates that the rider can board the transit vehicle at any point along the vehicle's travel path as described by shapes.txt, from this stop_time to the next stop_time in the trip's stop_sequence. Valid options are:
-              0 - Continuous stopping pickup.
-              1 or empty - No continuous stopping pickup.
-              2 - Must phone agency to arrange continuous stopping pickup.
-              3 - Must coordinate with driver to arrange continuous stopping pickup.
-              If this field is populated, it overrides any continuous pickup behavior defined in routes.txt. If this field is empty, the stop_time inherits any continuous pickup behavior defined in routes.txt. Forbidden if start_pickup_drop_off_window or end_pickup_drop_off_window are defined.
+            description: '{{ doc("stop_times_continuous_pickup") }}'
           - name: continuous_drop_off
-            description: >
-              Indicates that the rider can alight from the transit vehicle at any point along the vehicle's travel path as described by shapes.txt, from this stop_time to the next stop_time in the trip's stop_sequence. Valid options are:
-              0 - Continuous stopping drop off.
-              1 or empty - No continuous stopping drop off.
-              2 - Must phone agency to arrange continuous stopping drop off.
-              3 - Must coordinate with driver to arrange continuous stopping drop off.
-              If this field is populated, it overrides any continuous drop-off behavior defined in routes.txt. If this field is empty, the stop_time inherits any continuous drop-off behavior defined in routes.txt. Forbidden if start_pickup_drop_off_window or end_pickup_drop_off_window are defined.
+            description: '{{ doc("stop_times_continuous_drop_off") }}'
           - name: pickup_booking_rule_id
-            description: Identifies the boarding booking rule at this stop time. Recommended when pickup_type=2.
+            description: '{{ doc("stop_times_pickup_booking_rule_id") }}'
           - name: drop_off_booking_rule_id
-            description: Identifies the alighting booking rule at this stop time. Recommended when drop_off_type=2.
+            description: '{{ doc("stop_times_drop_off_booking_rule_id") }}'
 
       - name: calendar
-        tests:
+        data_tests:
         - dbt_utils.unique_combination_of_columns:
             combination_of_columns:
               - feed_id
@@ -258,33 +197,33 @@ sources:
             description: '{{ doc("calendar_service_id") }}'
           - name: monday
             description: '{{ doc("calendar_monday") }}'
-            tests:
+            data_tests:
             - &calendar_day_bool_test
               accepted_values:
                 values: ['0', '1']
           - name: tuesday
             description: '{{ doc("calendar_tuesday") }}'
-            tests:
+            data_tests:
               - *calendar_day_bool_test
           - name: wednesday
             description: '{{ doc("calendar_wednesday") }}'
-            tests:
+            data_tests:
               - *calendar_day_bool_test
           - name: thursday
             description: '{{ doc("calendar_thursday") }}'
-            tests:
+            data_tests:
               - *calendar_day_bool_test
           - name: friday
             description: '{{ doc("calendar_friday") }}'
-            tests:
+            data_tests:
               - *calendar_day_bool_test
           - name: saturday
             description: '{{ doc("calendar_saturday") }}'
-            tests:
+            data_tests:
               - *calendar_day_bool_test
           - name: sunday
             description: '{{ doc("calendar_sunday") }}'
-            tests:
+            data_tests:
               - *calendar_day_bool_test
           - name: start_date
             description: '{{ doc("calendar_start_date") }}'
@@ -292,7 +231,7 @@ sources:
             description: '{{ doc("calendar_end_date") }}'
 
       - name: calendar_dates
-        tests:
+        data_tests:
         - dbt_utils.unique_combination_of_columns:
             combination_of_columns:
               - feed_id
@@ -307,6 +246,6 @@ sources:
             description: '{{ doc("calendar_dates_date") }}'
           - name: exception_type
             description: '{{ doc("calendar_dates_exception_type") }}'
-            tests:
+            data_tests:
             - accepted_values:
                 values: ['1', '2']

@@ -1,0 +1,98 @@
+version: 2
+
+models:
+  - name: stg_routes
+    description: Staging layer for routes data from GTFS feed
+    columns:
+      - name: _feed_id
+        description: '{{ doc("feed_id_desc") }}'
+      - name: route_id
+        description: '{{ doc("routes_route_id") }}'
+      - name: agency_id
+        description: '{{ doc("routes_agency_id") }}'
+      - name: route_short_name
+        description: '{{ doc("routes_route_short_name") }}'
+      - name: route_long_name
+        description: '{{ doc("routes_route_long_name") }}'
+      - name: route_desc
+        description: '{{ doc("routes_route_desc") }}'
+      - name: route_type
+        description: '{{ doc("routes_route_type") }}'
+      - name: route_url
+        description: '{{ doc("routes_route_url") }}'
+      - name: route_color
+        description: '{{ doc("routes_route_color") }}'
+      - name: route_text_color
+        description: '{{ doc("routes_route_text_color") }}'
+      - name: route_sort_order
+        description: '{{ doc("routes_route_sort_order") }}'
+      - name: continuous_pickup
+        description: '{{ doc("routes_continuous_pickup") }}'
+      - name: continuous_drop_off
+        description: '{{ doc("routes_continuous_drop_off") }}'
+      - name: network_id
+        description: '{{ doc("routes_network_id") }}'
+
+  - name: stg_trips
+    description: Staging layer for trips data from GTFS feed
+    columns:
+      - name: feed_id
+        description: '{{ doc("feed_id_desc") }}'
+      - name: route_id
+        description: '{{ doc("trips_route_id") }}'
+      - name: service_id
+        description: '{{ doc("trips_service_id") }}'
+      - name: trip_id
+        description: '{{ doc("trips_trip_id") }}'
+      - name: trip_headsign
+        description: '{{ doc("trips_trip_headsign") }}'
+      - name: trip_short_name
+        description: '{{ doc("trips_trip_short_name") }}'
+      - name: direction_id
+        description: '{{ doc("trips_direction_id") }}'
+      - name: block_id
+        description: '{{ doc("trips_block_id") }}'
+      - name: shape_id
+        description: '{{ doc("trips_shape_id") }}'
+      - name: wheelchair_accessible
+        description: '{{ doc("trips_wheelchair_accessible") }}'
+      - name: bikes_allowed
+        description: '{{ doc("trips_bikes_allowed") }}'
+
+  - name: stg_calendar
+    description: Staging layer for calendar data from GTFS feed
+    columns:
+      - name: feed_id
+        description: '{{ doc("feed_id_desc") }}'
+      - name: service_id
+        description: '{{ doc("calendar_service_id") }}'
+      - name: monday
+        description: '{{ doc("calendar_monday") }}'
+      - name: tuesday
+        description: '{{ doc("calendar_tuesday") }}'
+      - name: wednesday
+        description: '{{ doc("calendar_wednesday") }}'
+      - name: thursday
+        description: '{{ doc("calendar_thursday") }}'
+      - name: friday
+        description: '{{ doc("calendar_friday") }}'
+      - name: saturday
+        description: '{{ doc("calendar_saturday") }}'
+      - name: sunday
+        description: '{{ doc("calendar_sunday") }}'
+      - name: start_date
+        description: '{{ doc("calendar_start_date") }}'
+      - name: end_date
+        description: '{{ doc("calendar_end_date") }}'
+
+  - name: stg_calendar_dates
+    description: Staging layer for calendar dates data from GTFS feed
+    columns:
+      - name: feed_id
+        description: '{{ doc("feed_id_desc") }}'
+      - name: service_id
+        description: '{{ doc("calendar_dates_service_id") }}'
+      - name: date
+        description: '{{ doc("calendar_dates_date") }}'
+      - name: exception_type
+        description: '{{ doc("calendar_dates_exception_type") }}'

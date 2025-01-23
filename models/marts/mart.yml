@@ -29,3 +29,40 @@ models:
           - accepted_values:
               values: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
+  - name: fct_service_trips
+    description: >
+      A fact table containing all trips that operate on each service date.
+      Combines service calendar with trip and route information.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - _feed_id
+            - service_date
+            - trip_id
+    columns:
+      - name: _feed_id
+        description: '{{ doc("feed_id_desc") }}'
+
+      - name: service_date
+        description: The date when service is available
+
+      - name: service_id
+        description: '{{ doc("calendar_service_id") }}'
+
+      - name: trip_id
+        description: '{{ doc("trips_trip_id") }}'
+
+      - name: route_id
+        description: '{{ doc("routes_route_id") }}'
+
+      - name: direction_id
+        description: '{{ doc("trips_direction_id") }}'
+
+      - name: route_short_name
+        description: '{{ doc("routes_route_short_name") }}'
+
+      - name: route_long_name
+        description: '{{ doc("routes_route_long_name") }}'
+
+      - name: route_type
+        description: '{{ doc("routes_route_type") }}'

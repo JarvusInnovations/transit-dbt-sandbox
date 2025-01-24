@@ -9,6 +9,8 @@ stg_stop_times AS (
         trip_id,
         arrival_time,
         departure_time,
+        {{ gtfs_time_to_seconds('arrival_time') }} AS arrival_seconds,
+        {{ gtfs_time_to_seconds('departure_time') }} AS departure_seconds,
         stop_id,
         stop_sequence,
         stop_headsign,

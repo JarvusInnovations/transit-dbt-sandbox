@@ -1,3 +1,8 @@
+
+# this is a YAML anchor: https://yaml.org/spec/1.2.2/#alias-nodes
+# it's kind of a trivial example because this field also has a documentation block defined: https://docs.getdbt.com/docs/build/documentation#using-docs-blocks
+descriptions: &feed_id_desc '{{ doc("feed_id_desc") }}'
+
 version: 2
 
 models:
@@ -5,7 +10,7 @@ models:
     description: Staging layer for routes data from GTFS feed
     columns:
       - name: _feed_id
-        description: '{{ doc("feed_id_desc") }}'
+        description: *feed_id_desc
       - name: route_id
         description: '{{ doc("routes_route_id") }}'
       - name: agency_id
@@ -36,8 +41,8 @@ models:
   - name: stg_trips
     description: Staging layer for trips data from GTFS feed
     columns:
-      - name: feed_id
-        description: '{{ doc("feed_id_desc") }}'
+      - name: _feed_id
+        description: *feed_id_desc
       - name: route_id
         description: '{{ doc("trips_route_id") }}'
       - name: service_id
@@ -62,8 +67,8 @@ models:
   - name: stg_calendar
     description: Staging layer for calendar data from GTFS feed
     columns:
-      - name: feed_id
-        description: '{{ doc("feed_id_desc") }}'
+      - name: _feed_id
+        description: *feed_id_desc
       - name: service_id
         description: '{{ doc("calendar_service_id") }}'
       - name: monday
@@ -88,8 +93,8 @@ models:
   - name: stg_calendar_dates
     description: Staging layer for calendar dates data from GTFS feed
     columns:
-      - name: feed_id
-        description: '{{ doc("feed_id_desc") }}'
+      - name: _feed_id
+        description: *feed_id_desc
       - name: service_id
         description: '{{ doc("calendar_dates_service_id") }}'
       - name: date
@@ -100,8 +105,8 @@ models:
   - name: stg_stops
     description: Staging layer for stops data from GTFS feed
     columns:
-      - name: feed_id
-        description: '{{ doc("feed_id_desc") }}'
+      - name: _feed_id
+        description: *feed_id_desc
       - name: stop_id
         description: '{{ doc("stops_stop_id") }}'
       - name: stop_code
@@ -136,14 +141,18 @@ models:
   - name: stg_stop_times
     description: Staging layer for stop times data from GTFS feed
     columns:
-      - name: feed_id
-        description: '{{ doc("feed_id_desc") }}'
+      - name: _feed_id
+        description: *feed_id_desc
       - name: trip_id
         description: '{{ doc("stop_times_trip_id") }}'
       - name: arrival_time
         description: '{{ doc("stop_times_arrival_time") }}'
       - name: departure_time
         description: '{{ doc("stop_times_departure_time") }}'
+      - name: arrival_seconds
+        description: Arrival time converted to seconds since midnight
+      - name: departure_seconds
+        description: Departure time converted to seconds since midnight
       - name: stop_id
         description: '{{ doc("stop_times_stop_id") }}'
       - name: stop_sequence

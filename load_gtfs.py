@@ -8,6 +8,7 @@ import requests
 import zipfile
 from io import BytesIO
 from pathlib import Path
+from urllib.parse import urlparse
 
 # Column definitions for each GTFS table
 # Only load a few core tables, this is not comprehensive 
@@ -110,11 +111,23 @@ GTFS_COLUMNS = {
     ]
 }
 
-def download_gtfs(url: str) -> BytesIO:
-    """Download GTFS feed from URL and return as bytes."""
-    response = requests.get(url)
-    response.raise_for_status()
-    return BytesIO(response.content)
+def get_gtfs_data(source: str) -> BytesIO:
+    """Get GTFS feed from URL or local file and return as bytes."""
+
+    # Try to parse as URL
+    parsed = urlparse(source)
+    if parsed.scheme and parsed.netloc:
+        # Valid URL components found
+        response = requests.get(source)
+        response.raise_for_status()
+        return BytesIO(response.content)
+    else:
+        # Handle as local file
+        path = Path(source)
+        if not path.exists():
+            raise FileNotFoundError(f"GTFS file not found: {source}")
+        with open(path, 'rb') as f:
+            return BytesIO(f.read())
 
 def load_gtfs_table(conn: duckdb.DuckDBPyConnection, zip_data: BytesIO, table_name: str, feed_id, append: bool = False):
     """Load a GTFS table from the zip file into DuckDB."""
@@ -171,7 +184,7 @@ def load_gtfs_table(conn: duckdb.DuckDBPyConnection, zip_data: BytesIO, table_na
 
 def main():
     parser = argparse.ArgumentParser(description="Load GTFS feed into DuckDB")
-    parser.add_argument("url", help="URL of GTFS feed zip file")
+    parser.add_argument("source", help="URL or local path of GTFS feed zip file")
     parser.add_argument("--append", action="store_true", help="Append to existing tables instead of replacing them")
     parser.add_argument("--feed_name", default='', help="A name for the feed to be stored as a label in DuckDB")
     args = parser.parse_args()
@@ -187,9 +200,9 @@ def main():
         load_time = pendulum.now('UTC')
         feed_id = base64.urlsafe_b64encode((str(load_time) + args.feed_name).encode()).decode()
 
-        # Download GTFS feed
-        print(f"Downloading GTFS feed from {args.url}")
-        zip_data = download_gtfs(args.url)
+        # Get GTFS feed data
+        print(f"Loading GTFS feed from {args.source}")
+        zip_data = get_gtfs_data(args.source)
 
         # Load an identifying table 
         if not args.append:

@@ -2,6 +2,8 @@
 import argparse
 import base64
 import duckdb
+import logging
+import os
 import pandas as pd
 import pendulum
 import requests
@@ -111,6 +113,20 @@ GTFS_COLUMNS = {
     ]
 }
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
+
+def drop_database(db_path: str):
+    """Drop the entire duckdb database if it exists"""
+    if os.path.exists(db_path):
+        os.remove(db_path)
+        logger.info(f"Dropped existing database: {db_path}")
+
 def get_gtfs_data(source: str) -> BytesIO:
     """Get GTFS feed from URL or local file and return as bytes."""
 
@@ -176,11 +192,11 @@ def load_gtfs_table(conn: duckdb.DuckDBPyConnection, zip_data: BytesIO, table_na
             cols_sql = ", ".join(common_cols)
             conn.execute(f"INSERT INTO raw.{table_name} ({cols_sql}) SELECT {cols_sql} FROM df")
 
-            print(f"Loaded {len(df)} rows into raw.{table_name}")
+            logger.info(f"Loaded {len(df)} rows into raw.{table_name}")
     except KeyError:
-        print(f"Warning: {table_name}.txt not found in GTFS feed")
+        logger.warning(f"{table_name}.txt not found in GTFS feed")
     except Exception as e:
-        print(f"Error loading {table_name}: {str(e)}")
+        logger.error(f"Error loading {table_name}: {str(e)}")
 
 def main():
     parser = argparse.ArgumentParser(description="Load GTFS feed into DuckDB")
@@ -189,8 +205,14 @@ def main():
     parser.add_argument("--feed_name", default='', help="A name for the feed to be stored as a label in DuckDB")
     args = parser.parse_args()
 
+    db_path = "transit_dbt_sandbox.duckdb"
+    
+    # Drop database if not appending
+    if not args.append:
+        drop_database(db_path)
+
     # Connect to DuckDB
-    conn = duckdb.connect("transit_dbt_sandbox.duckdb")
+    conn = duckdb.connect(db_path)
     
     try:
         # Create raw schema
@@ -201,7 +223,7 @@ def main():
         feed_id = base64.urlsafe_b64encode((str(load_time) + args.feed_name).encode()).decode()
 
         # Get GTFS feed data
-        print(f"Loading GTFS feed from {args.source}")
+        logger.info(f"Loading GTFS feed from {args.source}")
         zip_data = get_gtfs_data(args.source)
 
         # Load an identifying table 
@@ -218,11 +240,11 @@ def main():
         
         for table in tables:
             load_gtfs_table(conn, zip_data, table, feed_id, args.append)
-            
-        print("GTFS data load complete")
+        
+        logger.info("GTFS data load complete")
         
     except Exception as e:
-        print(f"Error: {str(e)}")
+        logger.error(f"Error: {str(e)}")
         raise
     finally:
         conn.close()

@@ -21,7 +21,6 @@ fct_service_stops AS (
         trips.route_short_name,
         trips.route_long_name,
         trips.route_type,
-        trips.service_date,
         stop_times.stop_id,
         stops.stop_name,
         stop_times.stop_sequence,

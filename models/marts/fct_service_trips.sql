@@ -21,8 +21,8 @@ fct_service_trips AS (
         routes.route_short_name,
         routes.route_long_name,
         routes.route_type
-    FROM service_calendar
-    LEFT JOIN trips 
+    FROM trips
+    LEFT JOIN service_calendar 
         ON service_calendar._feed_id = trips._feed_id
         AND service_calendar.service_id = trips.service_id
     LEFT JOIN routes
